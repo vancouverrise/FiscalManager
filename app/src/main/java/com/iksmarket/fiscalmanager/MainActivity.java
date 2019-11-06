@@ -1,16 +1,20 @@
 package com.iksmarket.fiscalmanager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.iksmarket.fiscalmanager.Bluetooth.BluetoothService;
 import com.iksmarket.fiscalmanager.Bluetooth.ResponseFromPrinter;
 
-import java.util.BitSet;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,10 +32,24 @@ public class MainActivity extends AppCompatActivity {
         testbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            fromByte((byte)1);
-                System.out.println("Смотри сюда: " + fromByte((byte)1).toString().trim().replace("{", "").replace("}", ""));
+
+                System.out.println("Смотри сюда: " + Integer.toBinaryString(1));
             }
         });
+
+        BroadcastReceiver printerReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Bundle b = intent.getExtras();
+                String message = b.getString("message");
+                if (message != null) {
+                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
+
+        registerReceiver(printerReceiver, new IntentFilter("PrinterResponse"));
 
 
 
@@ -50,31 +68,17 @@ public class MainActivity extends AppCompatActivity {
 
                Bundle extras = intent.getExtras();
                Intent i = new Intent("broadCastName");
-               // Data you need to pass to activity
+
                i.putExtra("message", "bitch");
 
                sendBroadcast(i);
+
            }
        });
 
 
 
     }
-
-    public BitSet fromByte(byte b)
-    {
-        BitSet bits = new BitSet(8);
-        for (int i = 0; i < 8; i++)
-        {
-            bits.set(i, (b & 1) == 1);
-            b >>= 1;
-        }
-        return bits;
-    }
-
-
-
-
 }
 
 

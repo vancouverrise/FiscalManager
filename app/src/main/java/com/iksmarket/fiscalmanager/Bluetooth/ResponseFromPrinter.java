@@ -1,10 +1,7 @@
 package com.iksmarket.fiscalmanager.Bluetooth;
 
-import com.google.common.primitives.Bytes;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,12 +11,17 @@ public class ResponseFromPrinter {
     private static List<Byte> bytes;
     private static List<Byte> start;
     private static List<Byte> end;
-
-    private static byte[] notListArray;
+    private static List<String> toActivity;
 
     private static List<Byte> receiverPacket = new ArrayList<>();
 
-    public static void decode(List<Byte> bytes) {
+    static String status;
+    static String result;
+    static String reserve;
+
+    static List<String> decode(List<Byte> bytes) {
+
+        toActivity = new ArrayList<>();
 
         if (bytes == null) {
             System.out.println("Nothing to decode");
@@ -35,23 +37,22 @@ public class ResponseFromPrinter {
             showError(bytes);
 
 
+
+
             ResponseFromPrinter.bytes = null;
             ResponseFromPrinter.start = null;
             ResponseFromPrinter.end = null;
+
+            status = null;
+            result = null;
+            reserve = null;
         }
+        return toActivity;
     }
 
-    public static List<Byte> getData() {
-        System.out.println("Packet: " + bytes);
-        System.out.println("Data: " + bytes.subList(5, bytes.size()));
-        notListArray = Bytes.toArray(bytes);
-        return bytes.subList(5, bytes.size());
 
-    }
-
-    public static List<Byte> dataBytes(List<Byte> receiverPacket) {
-        List<Byte> data = new ArrayList<>(receiverPacket);
-        ResponseFromPrinter.receiverPacket = data;
+    private static List<Byte> dataBytes(List<Byte> receiverPacket) {
+        ResponseFromPrinter.receiverPacket = new ArrayList<>(receiverPacket);
         List<Byte> messageWithNoDLE = removeDLE();
         if (isValid(messageWithNoDLE)) {
             bytes = removeCheckSum(messageWithNoDLE);
@@ -107,52 +108,42 @@ public class ResponseFromPrinter {
         }
     }
 
-    public static void showError(List<Byte> packetForErrors) {
+    public static void showError(List<Byte> bytes) {
+        toActivity.clear();
         if (bytes.size() >=5) {
-            System.out.println("Говорим про статус:");
             status(bytes.get(2));
-            System.out.println("Говорим про результат:");
             result((int) getNumber(bytes.get(3)));
-            System.out.println("Говорим про резерв:");
             reserv(bytes.get(4));
             System.out.println("Error bytes: " + bytes.get(2) +" "+ bytes.get(3) +" "+ bytes.get(4));
+            toActivity.add(status(bytes.get(2)));
+            toActivity.add(result((int) getNumber(bytes.get(3))));
+            toActivity.add(reserv(bytes.get(4)));
         } else ErrorICSE810T.nullResponse();
     }
 
-    public static void status(byte status) {
-        if (fromByte((byte)1).toString().trim().replace("{", "").replace("}", "").equals("0"))
-            ErrorICSE810T.status0();
+    public static String status(byte status) {
+        if ((status & 0x01) != 0)
+           return ErrorICSE810T.status0();
         if ((status & 0x02) != 0)
-            ErrorICSE810T.status1();
+           return ErrorICSE810T.status1();
         if ((status & 0x04) != 0)
-            ErrorICSE810T.status2();
+            return ErrorICSE810T.status2();
         if ((status & 0x08) != 0)
-            ErrorICSE810T.status3();
+            return ErrorICSE810T.status3();
         if ((status & 0x10) != 0)
-            ErrorICSE810T.status4();
+            return ErrorICSE810T.status4();
         if ((status & 0x20) != 0)
-            ErrorICSE810T.status5();
+            return ErrorICSE810T.status5();
         if ((status & 0x40) != 0)
-            ErrorICSE810T.status6();
+            return ErrorICSE810T.status6();
         if ((status & 0x80) != 0)
-            ErrorICSE810T.status7();
+            return ErrorICSE810T.status7();
+        return "хуй";
     }
 
-    public static BitSet fromByte(byte b)
-    {
-        BitSet bits = new BitSet(8);
-        for (int i = 0; i < 8; i++)
-        {
-            bits.set(i, (b & 1) == 1);
-            b >>= 1;
-        }
-        return bits;
-    }
-
-
-    private static void reserv(byte reserv) {
-        if ((reserv & 0x00) != 0)
-            ErrorICSE810T.reserv0();
+    public static String reserv(byte reserv) {
+        if ((reserv & 0x01) != 0)
+            return ErrorICSE810T.reserv0();
         if ((reserv & 0x02) != 0)
             ErrorICSE810T.reserv1();
         if ((reserv & 0x04) != 0)
@@ -167,9 +158,10 @@ public class ResponseFromPrinter {
             ErrorICSE810T.reserv6();
         if ((reserv & 0x80) != 0)
             ErrorICSE810T.reserv7();
+        return "хуй2";
     }
 
-    private static void result(int result) {
+    private static String result(int result) {
         switch (result) {
             case 0:
                 ErrorICSE810T.result0();
@@ -282,6 +274,7 @@ public class ResponseFromPrinter {
             case 48:
                 ErrorICSE810T.result48();
         }
+        return "Да что угодно";
     }
 
     public static long getNumber(byte b) {
@@ -297,7 +290,5 @@ public class ResponseFromPrinter {
         return number;
     }
 
-    public static byte[] getNotListArray() {
-        return notListArray;
-    }
+
 }

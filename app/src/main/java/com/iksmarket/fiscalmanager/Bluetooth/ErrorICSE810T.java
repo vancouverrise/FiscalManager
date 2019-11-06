@@ -1,8 +1,9 @@
 package com.iksmarket.fiscalmanager.Bluetooth;
 
 
-
 public class ErrorICSE810T {
+
+
 
     public static void nullResponse(){
         System.err.println("NULL RESPONSE");
@@ -12,43 +13,54 @@ public class ErrorICSE810T {
         System.err.println("You entered negative amount (" + sum + " UAH.)!");
     }
 
-    public static void status0() {
+    public static String status0() {
         System.err.println("(S0) принтер не готов".toUpperCase() + "\nРекомендуется проверить принтер на предмет заклинивания печатающего механизма и плотного\n" +
+                "закрытия крышек. Если блокировка не устраняется, то необходимо выполнить сброс принтера путем\n" +
+                "его выключения и включения.");
+
+        return("(S0) принтер не готов".toUpperCase() + "\nРекомендуется проверить принтер на предмет заклинивания печатающего механизма и плотного\n" +
                 "закрытия крышек. Если блокировка не устраняется, то необходимо выполнить сброс принтера путем\n" +
                 "его выключения и включения.");
     }
 
-    public static void status1() {
+    public static String status1() {
         System.err.println("(S1) ошибка модема".toUpperCase() + "\nОбратитесь в сервисный-центр.");
+        return ("(S1) ошибка модема".toUpperCase() + "\nОбратитесь в сервисный-центр.");
     }
 
-    public static void status2() {
+    public static String status2() {
         System.err.println("(S2) ошибка или переполнение фискальной памяти".toUpperCase() + "\nОбратитесь в сервисный-центр.");
+        return null;
     }
 
-    public static void status3() {
+    public static String status3() {
         System.err.println("(S3) неправильная дата или ошибка часов".toUpperCase() + "\nОбратитесь в сервисный-центр.");
+        return null;
     }
 
-    public static void status4() {
+    public static String status4() {
         System.err.println("(S4) ошибка индикатора".toUpperCase() + "\nПодключите индекатор.");
+        return ("(S4) ошибка индикатора".toUpperCase() + "\nПодключите индекатор.");
     }
 
-    public static void status5() {
+    public static String status5() {
         System.err.println("(S5) превышение продолжительности смены".toUpperCase() + "\nСделайте Z - Отчет.");
+        return null;
     }
 
-    public static void status6() {
+    public static String status6() {
         System.err.println("(S6) снижение рабочего напряжения питания".toUpperCase() + "\nПроверьте блок питания.");
+        return null;
     }
 
-    public static void status7() {
+    public static String status7() {
         System.err.println("(S7) команда не существует или запрещена в данном режиме".toUpperCase() + "\nПроверьте последовательность выполнения команд.");
+        return null;
     }
 
-    public static void result0() {
+    public static String result0() {
         System.err.println("(R0) нормальное завершение".toUpperCase());
-
+        return ("(R0) нормальное завершение".toUpperCase());
     }
 
     public static void result1() {
@@ -195,8 +207,9 @@ public class ErrorICSE810T {
         System.err.println("(R48) нет ответа от модема".toUpperCase());
     }
 
-    public static void reserv0() {
+    public static String reserv0() {
         System.err.println("(RE0) открыт чек служебного отчета".toUpperCase());
+        return null;
     }
 
     public static void reserv1() {

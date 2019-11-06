@@ -57,24 +57,22 @@ public class BluetoothService extends Service {
 
     List<Byte> commandToSend = new ArrayList<Byte>();
     private boolean stopThread;
-    // SPP UUID service - this should work for most devices
+
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    // String for MAC address
+
     private static final String MAC_ADDRESS = "YOUR:MAC:ADDRESS:HERE";
     private              StringBuilder recDataString = new StringBuilder();
 
     BroadcastReceiver broadcastReceiver =  new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             Bundle b = intent.getExtras();
-
             String message = b.getString("message");
 
-            Log.e("newmesage", "" + message);
-            if (message != null && message.equals("bitch")) {
+        Log.e("newmesage", "" + message);
+             if (message != null && message.equals("bitch")) {
                 mConnectedThread.write(ArrayUtils.toPrimitive(commandToSend.toArray(new Byte[commandToSend.size()])));
-            }
+             }
         }
     };
 
@@ -85,9 +83,9 @@ public class BluetoothService extends Service {
         stopThread = false;
         commandToSend.add((byte)0x10);
         commandToSend.add((byte)0x02);
-        commandToSend.add((byte)0x24);
+        commandToSend.add((byte)0x25);
         commandToSend.add((byte)0x00);
-        commandToSend.add((byte)0xDC);
+        commandToSend.add((byte)0xDB);
         commandToSend.add((byte)0x10);
         commandToSend.add((byte)0x03);
 
@@ -280,7 +278,11 @@ public class BluetoothService extends Service {
                 {
                     System.out.println("Here we fucking go!");
                     System.out.println(temp);
-                    ResponseFromPrinter.decode(temp);
+
+                    Intent i = new Intent("PrinterResponse");
+                    i.putExtra("message", ResponseFromPrinter.decode(temp).get(0));
+                    sendBroadcast(i);
+
                     temp.clear();
                 }
             }
@@ -346,83 +348,6 @@ public class BluetoothService extends Service {
                 stopSelf();
             }
         }
-    }
-
-    public byte[] decodeAnswer(byte[] outputData) {
-
-      /*  for (int i = 0; i < temp.size(); i++) {
-
-            if (temp.get(i) == (byte)16){
-                if (temp.get(i + 1) == (byte) 16){
-                    System.out.println("Хрень");
-                }
-                else if (temp.get(i + 1) == (byte)3){
-                    System.out.println("end of packet!");
-
-                }
-            }
-        }*/
-
-
-        if (outputData.length == 0)
-            return new byte[]{};
-
-        if (outputData[0] == 0x06) {
-            int i = 0;
-            byte symbol = 0x00;
-
-            byte[] normalizedAnswer = new byte[0];
-
-            boolean dleDetected = false;
-            boolean synDetected = false;
-
-            //remove all 0x16 symbols
-            for (i = 0; i < outputData.length; i++) {
-                if (outputData[i] == 0x10 && !dleDetected) dleDetected = true;
-                if (outputData[i] == 0x16 && !synDetected) synDetected = true;
-
-                if (!dleDetected && synDetected) {
-                    symbol++;
-                    continue;
-                }
-
-                normalizedAnswer = resizeArray(normalizedAnswer, normalizedAnswer.length + 1);
-                normalizedAnswer[normalizedAnswer.length - 1] = outputData[i];
-            }
-
-            if (synDetected && !dleDetected)
-                return new byte[]{};
-
-            outputData = (byte[]) normalizedAnswer.clone();
-            normalizedAnswer = new byte[0];
-
-            //remove all dolby 0x10 symbols
-            for (i = 0; i < (outputData.length - 1); i++) {
-                normalizedAnswer = resizeArray(normalizedAnswer, normalizedAnswer.length + 1);
-                normalizedAnswer[normalizedAnswer.length - 1] = outputData[i];
-                if (outputData[i] == 0x10 && outputData[i + 1] == 0x10) i++;
-            }
-            normalizedAnswer = resizeArray(normalizedAnswer, normalizedAnswer.length + 1);
-            normalizedAnswer[normalizedAnswer.length - 1] = outputData[i];
-
-            while (true) {
-                if (normalizedAnswer[normalizedAnswer.length - 1] == 0x03 && normalizedAnswer[normalizedAnswer.length - 2] == 0x10 && normalizedAnswer.length > 1) {
-                    break;
-                } else {
-                    normalizedAnswer = resizeArray(normalizedAnswer, normalizedAnswer.length - 1);
-                }
-            }
-
-            if (normalizedAnswer.length > 8) {
-                normalizedAnswer = resizeArray(normalizedAnswer, normalizedAnswer.length - 3);
-                ArrayUtils.reverse(normalizedAnswer);
-                normalizedAnswer = resizeArray(normalizedAnswer, normalizedAnswer.length - 5);
-                ArrayUtils.reverse(normalizedAnswer);
-                return normalizedAnswer;
-            } else return new byte[]{};
-        }
-
-        return new byte[]{};
     }
 
     public static byte[] resizeArray(byte[] oldArray, int newSize) {
