@@ -8,33 +8,33 @@ import java.util.List;
 
 public class ResponseFromPrinter {
 
-    private static List<Byte> bytes;
+    static List<Byte> bytes;
     private static List<Byte> start;
     private static List<Byte> end;
     private static List<String> toActivity;
 
     private static List<Byte> receiverPacket = new ArrayList<>();
 
-    static String status;
-    static String result;
-    static String reserve;
+    private static String status;
+    private static String result;
+    private static String reserve;
 
-    static List<String> decode(List<Byte> bytes) {
+    static List<String> decode(List<Byte> incomingPacket) {
 
         toActivity = new ArrayList<>();
 
-        if (bytes == null) {
+        if (incomingPacket == null) {
             System.out.println("Nothing to decode");
 
         }
         else {
 
-            ResponseFromPrinter.bytes = bytes;
+            bytes = incomingPacket;
             start = Arrays.asList((byte) 16, (byte) 2);
             end = Arrays.asList((byte) 16, (byte) 3);
 
-            dataBytes(bytes);
-            showError(bytes);
+            dataBytes(incomingPacket);
+            showError(incomingPacket);
 
 
 
@@ -111,13 +111,13 @@ public class ResponseFromPrinter {
     public static void showError(List<Byte> bytes) {
         toActivity.clear();
         if (bytes.size() >=5) {
-            status(bytes.get(2));
-            result((int) getNumber(bytes.get(3)));
-            reserv(bytes.get(4));
-            System.out.println("Error bytes: " + bytes.get(2) +" "+ bytes.get(3) +" "+ bytes.get(4));
-            toActivity.add(status(bytes.get(2)));
-            toActivity.add(result((int) getNumber(bytes.get(3))));
-            toActivity.add(reserv(bytes.get(4)));
+            status(bytes.get(4));
+            result(bytes.get(5));
+            reserv(bytes.get(6));
+            System.out.println("Error bytes: " + bytes.get(4) +" "+ bytes.get(5) +" "+ bytes.get(6));
+           toActivity.add(status(bytes.get(4)));
+           toActivity.add(result(bytes.get(5)));
+           toActivity.add(reserv(bytes.get(6)));
         } else ErrorICSE810T.nullResponse();
     }
 
@@ -138,27 +138,27 @@ public class ResponseFromPrinter {
             return ErrorICSE810T.status6();
         if ((status & 0x80) != 0)
             return ErrorICSE810T.status7();
-        return "хуй";
+        return "Ответ статуса отсутствует";
     }
 
     public static String reserv(byte reserv) {
         if ((reserv & 0x01) != 0)
             return ErrorICSE810T.reserv0();
         if ((reserv & 0x02) != 0)
-            ErrorICSE810T.reserv1();
+            return ErrorICSE810T.reserv1();
         if ((reserv & 0x04) != 0)
-            ErrorICSE810T.reserv2();
+            return ErrorICSE810T.reserv2();
         if ((reserv & 0x08) != 0)
-            ErrorICSE810T.reserv3((reserv & 0x08));
+            return  ErrorICSE810T.reserv3((reserv & 0x08));
         if ((reserv & 0x10) != 0)
-            ErrorICSE810T.reserv4();
+            return  ErrorICSE810T.reserv4();
         if ((reserv & 0x20) != 0)
-            ErrorICSE810T.reserv5();
+            return ErrorICSE810T.reserv5();
         if ((reserv & 0x40) != 0)
-            ErrorICSE810T.reserv6();
+            return  ErrorICSE810T.reserv6();
         if ((reserv & 0x80) != 0)
-            ErrorICSE810T.reserv7();
-        return "хуй2";
+            return ErrorICSE810T.reserv7();
+        return "Ответ резерва отсутствует";
     }
 
     private static String result(int result) {

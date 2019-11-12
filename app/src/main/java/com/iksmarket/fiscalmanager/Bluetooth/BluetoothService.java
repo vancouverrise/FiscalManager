@@ -16,21 +16,16 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-
 import com.github.ivbaranov.rxbluetooth.BluetoothConnection;
+import com.iksmarket.fiscalmanager.Bluetooth.Driver.Commands;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.Clock;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,7 +40,7 @@ public class BluetoothService extends Service {
 
 
     private static final String LOG_TAG = "dd" ;
-    final int handlerState = 0;                        //used to identify handler message
+    final int handlerState = 0;
     Handler bluetoothIn;
     BluetoothDevice devices;
     public BluetoothAdapter btAdapter = null;
@@ -56,7 +51,6 @@ public class BluetoothService extends Service {
 
 
     List<Byte> commandToSend = new ArrayList<Byte>();
-    private boolean stopThread;
 
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -67,12 +61,16 @@ public class BluetoothService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle b = intent.getExtras();
-            String message = b.getString("message");
+            String message = b.getString("CommandToSend");
+            Log.e("Send to printer:", "" + message);
 
-        Log.e("newmesage", "" + message);
-             if (message != null && message.equals("bitch")) {
-                mConnectedThread.write(ArrayUtils.toPrimitive(commandToSend.toArray(new Byte[commandToSend.size()])));
+             if (message != null && message.equals("PrintVersion")) {
+                mConnectedThread.write(ArrayUtils.toPrimitive(Commands.printVer().toArray(new Byte[Commands.printVer().size()])));
              }
+
+            if (message != null && message.equals("dayClearReport")) {
+                mConnectedThread.write(ArrayUtils.toPrimitive(Commands.dayClearReport(0).toArray(new Byte[Commands.dayClearReport(0).size()])));
+            }
         }
     };
 
@@ -80,17 +78,7 @@ public class BluetoothService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d("BT SERVICE", "SERVICE CREATED");
-        stopThread = false;
-        commandToSend.add((byte)0x10);
-        commandToSend.add((byte)0x02);
-        commandToSend.add((byte)0x25);
-        commandToSend.add((byte)0x00);
-        commandToSend.add((byte)0xDB);
-        commandToSend.add((byte)0x10);
-        commandToSend.add((byte)0x03);
-
-        System.out.println("Sending this: " + commandToSend);
-        registerReceiver(broadcastReceiver, new IntentFilter("broadCastName"));
+        registerReceiver(broadcastReceiver, new IntentFilter("PrinterBroadcast"));
     }
 
 
@@ -122,7 +110,7 @@ public class BluetoothService extends Service {
     public void onDestroy() {
         super.onDestroy();
         bluetoothIn.removeCallbacksAndMessages(null);
-        stopThread = true;
+
         if (mConnectedThread != null) {
             mConnectedThread.closeStreams();
         }
@@ -139,7 +127,7 @@ public class BluetoothService extends Service {
         return new Binder();
     }
 
-    //Checks that the Android device BluetoothService is available and prompts to be turned on if off
+
     private void checkBTState() {
 
         if (btAdapter == null) {
@@ -173,7 +161,7 @@ public class BluetoothService extends Service {
         }
     }
 
-    // New Class for Connecting Thread
+
     private class ConnectingThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
@@ -237,7 +225,7 @@ public class BluetoothService extends Service {
                     Log.d("DEBUG BT", "SOCKET CLOSING FAILED :" + e2.toString());
                     Log.d("BT SERVICE", "SOCKET CLOSING FAILED, STOPPING SERVICE");
                     stopSelf();
-                    //insert code to deal with this
+
                 }
             } catch (IllegalStateException e) {
                 Log.d("DEBUG BT", "CONNECTED THREAD START FAILED : " + e.toString());
@@ -250,10 +238,10 @@ public class BluetoothService extends Service {
 
         public void closeSocket() {
             try {
-                //Don't leave BluetoothService sockets open when leaving activity
+
                 mmSocket.close();
             } catch (IOException e2) {
-                //insert code to deal with this
+
                 Log.d("DEBUG BT", e2.toString());
                 Log.d("BT SERVICE", "SOCKET CLOSING FAILED, STOPPING SERVICE");
                 stopSelf();
@@ -289,20 +277,15 @@ public class BluetoothService extends Service {
         }
     }
 
-
-
-    // New Class for Connected Thread
     public class ConnectedThread extends Thread {
 
-
-        //creation of the connect thread
         public ConnectedThread(BluetoothSocket socket) {
             Log.d("DEBUG BT", "IN CONNECTED THREAD");
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
             try {
-                //Create I/O streams for connection
+
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
@@ -323,13 +306,13 @@ public class BluetoothService extends Service {
 
         }
 
-        //write method
+
         public void write(byte[] input) {
             try {
-                mmOutStream.write(input); //write bytes over BT connection via outstream
+                mmOutStream.write(input);
 
             } catch (IOException e) {
-                //if you cannot write, close the application
+
                 Log.d("DEBUG BT", "UNABLE TO READ/WRITE " + e.toString());
                 Log.d("BT SERVICE", "UNABLE TO READ/WRITE, STOPPING SERVICE");
                 stopSelf();
@@ -338,28 +321,15 @@ public class BluetoothService extends Service {
 
         public void closeStreams() {
             try {
-                //Don't leave BluetoothService sockets open when leaving activity
+
                 mmInStream.close();
                 mmOutStream.close();
             } catch (IOException e2) {
-                //insert code to deal with this
+
                 Log.d("DEBUG BT", e2.toString());
                 Log.d("BT SERVICE", "STREAM CLOSING FAILED, STOPPING SERVICE");
                 stopSelf();
             }
         }
     }
-
-    public static byte[] resizeArray(byte[] oldArray, int newSize) {
-
-        byte[] newArray = new byte[newSize];
-
-        for (int i = 0; i < ((newSize >= oldArray.length) ? oldArray.length : newSize); i++) {
-            newArray[i] = oldArray[i];
-        }
-
-        return newArray;
-    }
-
-
 }

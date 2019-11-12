@@ -7,14 +7,13 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.iksmarket.fiscalmanager.Bluetooth.BluetoothService;
+import com.iksmarket.fiscalmanager.Bluetooth.Driver.Commands;
 import com.iksmarket.fiscalmanager.Bluetooth.ResponseFromPrinter;
-
-import org.apache.commons.lang3.ArrayUtils;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                System.out.println("Смотри сюда: " + Integer.toBinaryString(1));
+                Commands.printVer();
             }
         });
 
@@ -41,9 +40,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Bundle b = intent.getExtras();
-                String message = b.getString("message");
+                String message = null;
+                if (b != null) {
+                    message = b.getString("message");
+                }
                 if (message != null) {
-                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                    FancyToast.makeText(MainActivity.this, message, FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();
                 }
 
             }
@@ -53,24 +55,26 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
         testbutton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ResponseFromPrinter.status((byte)2);
+
+                Intent i = new Intent("PrinterBroadcast");
+                i.putExtra("CommandToSend", "dayClearReport");
+                sendBroadcast(i);
             }
         });
+
         intent = new Intent(this, BluetoothService.class);
         startService(intent);
 
        button.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-
-               Bundle extras = intent.getExtras();
-               Intent i = new Intent("broadCastName");
-
-               i.putExtra("message", "bitch");
-
+               Intent i = new Intent("PrinterBroadcast");
+               i.putExtra("CommandToSend", "PrintVersion");
                sendBroadcast(i);
 
            }

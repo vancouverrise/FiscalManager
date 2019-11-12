@@ -17,10 +17,8 @@ public class ErrorICSE810T {
         System.err.println("(S0) принтер не готов".toUpperCase() + "\nРекомендуется проверить принтер на предмет заклинивания печатающего механизма и плотного\n" +
                 "закрытия крышек. Если блокировка не устраняется, то необходимо выполнить сброс принтера путем\n" +
                 "его выключения и включения.");
+        return("(S0) принтер не готов".toUpperCase());
 
-        return("(S0) принтер не готов".toUpperCase() + "\nРекомендуется проверить принтер на предмет заклинивания печатающего механизма и плотного\n" +
-                "закрытия крышек. Если блокировка не устраняется, то необходимо выполнить сброс принтера путем\n" +
-                "его выключения и включения.");
     }
 
     public static String status1() {
@@ -30,12 +28,13 @@ public class ErrorICSE810T {
 
     public static String status2() {
         System.err.println("(S2) ошибка или переполнение фискальной памяти".toUpperCase() + "\nОбратитесь в сервисный-центр.");
-        return null;
+        return ("(S2) ошибка или переполнение фискальной памяти".toUpperCase() + "\nОбратитесь в сервисный-центр.");
     }
 
     public static String status3() {
         System.err.println("(S3) неправильная дата или ошибка часов".toUpperCase() + "\nОбратитесь в сервисный-центр.");
-        return null;
+        return("(S3) неправильная дата или ошибка часов".toUpperCase() + "\nОбратитесь в сервисный-центр.");
+
     }
 
     public static String status4() {
@@ -45,17 +44,22 @@ public class ErrorICSE810T {
 
     public static String status5() {
         System.err.println("(S5) превышение продолжительности смены".toUpperCase() + "\nСделайте Z - Отчет.");
-        return null;
+        return ("(S5) превышение продолжительности смены".toUpperCase() + "\nСделайте Z - Отчет.");
+
     }
 
     public static String status6() {
         System.err.println("(S6) снижение рабочего напряжения питания".toUpperCase() + "\nПроверьте блок питания.");
-        return null;
+        return ("(S6) снижение рабочего напряжения питания".toUpperCase() + "\nПроверьте блок питания.");
+
     }
 
     public static String status7() {
         System.err.println("(S7) команда не существует или запрещена в данном режиме".toUpperCase() + "\nПроверьте последовательность выполнения команд.");
-        return null;
+        return ("(S7) команда не существует или запрещена в данном режиме".toUpperCase() + "\nПроверьте последовательность выполнения команд.");
+
+
+
     }
 
     public static String result0() {
@@ -207,38 +211,47 @@ public class ErrorICSE810T {
         System.err.println("(R48) нет ответа от модема".toUpperCase());
     }
 
+
+
     public static String reserv0() {
         System.err.println("(RE0) открыт чек служебного отчета".toUpperCase());
-        return null;
+        return ("(RE0) открыт чек служебного отчета".toUpperCase());
     }
 
-    public static void reserv1() {
+    public static String reserv1() {
         System.err.println("(RE1) состояние аварии (команда завершится после устранения ошибки)".toUpperCase());
+        return("(RE1) состояние аварии (команда завершится после устранения ошибки)".toUpperCase());
     }
 
-    public static void reserv2() {
+    public static String reserv2() {
         System.err.println("(RE2) отсутствие бумаги, если принтер не готов".toUpperCase());
+        return("(RE2) отсутствие бумаги, если принтер не готов".toUpperCase());
     }
 
-    public static void reserv3(int i) {
+    public static String reserv3(int i) {
         System.err.println(("(RE3) чек: " + ((i == 0) ? "продажи" : "выплаты")).toUpperCase());
+        return(("(RE3) чек: " + ((i == 0) ? "продажи" : "выплаты")).toUpperCase());
+
     }
 
-    public static void reserv4() {
+    public static String reserv4() {
         System.err.println("(RE4) принтер фискализирован".toUpperCase());
+        return("(RE4) принтер фискализирован".toUpperCase());
     }
 
-    public static void reserv5() {
+    public static String reserv5() {
         System.err.println("(RE5) смена открыта".toUpperCase());
+        return("(RE5) смена открыта".toUpperCase());
     }
 
-    public static void reserv6() {
+    public static String reserv6() {
         System.err.println("(RE6) открыт чек".toUpperCase());
+        return("(RE6) открыт чек".toUpperCase());
     }
 
-    public static void reserv7() {
+    public static String reserv7() {
         System.err.println("(RE7) ЭККР не персонализирован".toUpperCase());
-
+        return("(RE7) ЭККР не персонализирован".toUpperCase());
     }
 }
 

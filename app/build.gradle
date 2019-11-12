@@ -30,5 +30,6 @@ dependencies {
     api 'com.google.guava:guava:25.1-android'
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'com.github.ivbaranov:rxbluetooth2:2.1.1'
+    implementation 'com.github.Shashank02051997:FancyToast-Android:0.1.6'
 
 }
