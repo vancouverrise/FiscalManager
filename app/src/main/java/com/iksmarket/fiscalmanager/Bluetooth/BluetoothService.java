@@ -78,7 +78,8 @@ public class BluetoothService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d("BT SERVICE", "SERVICE CREATED");
-        registerReceiver(broadcastReceiver, new IntentFilter("PrinterBroadcast"));
+        registerReceiver(broadcastReceiver, new IntentFilter("PrinterBroadcasty"));
+
     }
 
 
@@ -109,6 +110,7 @@ public class BluetoothService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         bluetoothIn.removeCallbacksAndMessages(null);
 
         if (mConnectedThread != null) {
@@ -118,6 +120,8 @@ public class BluetoothService extends Service {
             mConnectingThread.closeSocket();
         }
         Log.d("SERVICE", "onDestroy");
+
+
     }
 
     @Nullable

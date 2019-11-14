@@ -142,23 +142,24 @@ public class ResponseFromPrinter {
     }
 
     public static String reserv(byte reserv) {
+        String reservString = "";
         if ((reserv & 0x01) != 0)
-            return ErrorICSE810T.reserv0();
+        reservString = reservString.concat(ErrorICSE810T.reserv0());
         if ((reserv & 0x02) != 0)
-            return ErrorICSE810T.reserv1();
+            reservString = reservString.concat(ErrorICSE810T.reserv1());
         if ((reserv & 0x04) != 0)
-            return ErrorICSE810T.reserv2();
+            reservString = reservString.concat(ErrorICSE810T.reserv2());
         if ((reserv & 0x08) != 0)
-            return  ErrorICSE810T.reserv3((reserv & 0x08));
+            reservString = reservString.concat(ErrorICSE810T.reserv3((reserv & 0x08)));
         if ((reserv & 0x10) != 0)
-            return  ErrorICSE810T.reserv4();
+            reservString = reservString.concat(ErrorICSE810T.reserv4());
         if ((reserv & 0x20) != 0)
-            return ErrorICSE810T.reserv5();
+            reservString = reservString.concat(ErrorICSE810T.reserv5());
         if ((reserv & 0x40) != 0)
-            return  ErrorICSE810T.reserv6();
+            reservString = reservString.concat(ErrorICSE810T.reserv6());
         if ((reserv & 0x80) != 0)
-            return ErrorICSE810T.reserv7();
-        return "Ответ резерва отсутствует";
+            reservString = reservString.concat(ErrorICSE810T.reserv7());
+        return reservString;
     }
 
     private static String result(int result) {

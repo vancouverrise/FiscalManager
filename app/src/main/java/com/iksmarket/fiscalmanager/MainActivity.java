@@ -12,13 +12,26 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.iksmarket.fiscalmanager.Bluetooth.BluetoothService;
 import com.iksmarket.fiscalmanager.Bluetooth.Driver.Commands;
-import com.iksmarket.fiscalmanager.Bluetooth.ResponseFromPrinter;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 public class MainActivity extends AppCompatActivity {
 
     Intent intent;
     Button button, testbutton, testbutton2;
+
+    BroadcastReceiver printerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle b = intent.getExtras();
+            String message = null;
+            if (b != null) {
+                message = b.getString("message");
+            }
+            if (message != null) {
+                FancyToast.makeText(MainActivity.this, message, FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,20 +49,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        BroadcastReceiver printerReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Bundle b = intent.getExtras();
-                String message = null;
-                if (b != null) {
-                    message = b.getString("message");
-                }
-                if (message != null) {
-                    FancyToast.makeText(MainActivity.this, message, FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();
-                }
-
-            }
-        };
 
         registerReceiver(printerReceiver, new IntentFilter("PrinterResponse"));
 
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
        button.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               Intent i = new Intent("PrinterBroadcast");
+               Intent i = new Intent("PrinterBroadcasty");
                i.putExtra("CommandToSend", "PrintVersion");
                sendBroadcast(i);
 
@@ -82,6 +81,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        intent = new Intent(this, BluetoothService.class);
+        startService(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(printerReceiver);
     }
 }
 

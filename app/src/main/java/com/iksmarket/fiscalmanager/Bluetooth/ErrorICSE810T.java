@@ -251,7 +251,8 @@ public class ErrorICSE810T {
 
     public static String reserv7() {
         System.err.println("(RE7) ЭККР не персонализирован".toUpperCase());
-        return("(RE7) ЭККР не персонализирован".toUpperCase());
+
+        return("(RE7) ЭККР не персонализирован \\n".toUpperCase());
     }
 }
 
